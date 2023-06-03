@@ -105,4 +105,81 @@ public class DAO {
             return false;
         }
     }
+    public Boolean borrarProducto(Producto nfc) {
+
+        int registrosAfectadosConsulta = 0;
+
+        try {
+
+            conexionBBDD = DriverManager.getConnection(servidor, usuario, passwd);
+            String SQL = "DELETE FROM products "
+                    + " WHERE productCode = ? ";
+
+            PreparedStatement st = conexionBBDD.prepareStatement(SQL);
+
+            st.setInt(1, Integer.valueOf(nfc.getProductCode()));
+
+            registrosAfectadosConsulta = st.executeUpdate();
+            st.close();
+            conexionBBDD.close();
+
+            if (registrosAfectadosConsulta == 1) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error:" + e.toString());
+            return false;
+        }
+    }
+    public Boolean actualizarProducto(Producto producto) {
+
+        int registrosAfectadosConsulta = 0;
+
+        try {
+            conexionBBDD = DriverManager.getConnection(servidor, usuario, passwd);
+            String SQL = "UPDATE products ("
+                    + " productCode ,"
+                    + " productName ,"
+                    + " productLine ,"
+                    + " productScale ,"
+                    + " productVendor ,"
+                    + " productDescription ,"
+                    + " quantityInStock ,"
+                    + " buyPrice ,"
+                    + " MSRP  )"
+                    + " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            PreparedStatement st = conexionBBDD.prepareStatement(SQL);
+            st.setString(1, producto.getProductCode());
+            st.setString(2, producto.getProductName());
+            st.setString(3, producto.getProductLine());
+            st.setString(4, producto.getProductScale());
+            st.setString(5, producto.getProductVendor());
+            st.setString(6, producto.getProductDescription());
+
+            st.setInt(7, producto.getQuantityInStock());
+            st.setDouble(8, producto.getBuyPrice());
+            st.setDouble(9, producto.getMSRP());
+
+            registrosAfectadosConsulta = st.executeUpdate();
+            st.close();
+            conexionBBDD.close();
+
+            if (registrosAfectadosConsulta == 1) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error:" + e.toString());
+            return false;
+        }
+    }
+
 }

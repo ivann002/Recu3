@@ -7,6 +7,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.converter.NumberStringConverter;
 
+import java.sql.Date;
+import java.util.Optional;
+
 public class HelloController {
     private DAO productDAO = new DAO();
     private Producto productoAux;
@@ -57,6 +60,9 @@ public class HelloController {
     @FXML
     private TableColumn tcProductCode;
 
+    private DAO dao = new DAO();
+    private ObservableList<Producto> olProductos;
+
     public void initialize()  {
 
         cargarDatosTabla();
@@ -78,6 +84,21 @@ public class HelloController {
         txtVendedor.textProperty().bindBidirectional(producto.productVendorProperty());
     }
 
+    private void cargarDatos(){
+        olProductos = dao.obtenerProductos();
+
+        tcProductCode.setCellValueFactory(new PropertyValueFactory<Producto, String>("productCode"));
+        tcProductName.setCellValueFactory(new PropertyValueFactory<Producto, String>("productName"));
+        tcProductLine.setCellValueFactory(new PropertyValueFactory<Producto, String>("productLine"));
+        tcProductScale.setCellValueFactory(new PropertyValueFactory<Producto, String>("productScale"));
+        tcProductVendor.setCellValueFactory(new PropertyValueFactory<Producto, String>("productVendor"));
+        tcProductDescription.setCellValueFactory(new PropertyValueFactory<Producto, String>("productDescription"));
+        tcQuantityInStock.setCellValueFactory(new PropertyValueFactory<Producto, Integer>("quantityInStock"));
+        tcBuyPrice.setCellValueFactory(new PropertyValueFactory<Producto, Double>("buyPrice"));
+        tcMSRP.setCellValueFactory(new PropertyValueFactory<Producto,Double>("MSRP"));
+        tvProductos.setItems(olProductos);
+    }
+
     public void onAltaClicked(ActionEvent actionEvent) {
         if ( ! productoAux.getProductCode().trim().equals("")) {
             if (productDAO.altaProducto(productoAux)) {
@@ -92,28 +113,27 @@ public class HelloController {
 
     }
     public void onBorrarClicked(ActionEvent actionEvent) {
-        if ( ! productoAux.getProductCode().trim().equals("")) {
-            if (productDAO.altaProducto(productoAux)) {
-                cargarDatosTabla();
+        Alert alert;
+        String Codigo = String.valueOf(productoAux.getProductCode());
+        alert = new Alert(Alert.AlertType.CONFIRMATION, "Quieres borrar la columna?");
+        Optional<ButtonType> action  = alert.showAndWait();
+        if(action.get() == ButtonType.OK) {
+            if (!Codigo.trim().equals("")){
+                if(dao.borrarProducto(productoAux)){
+                    alert = new Alert(Alert.AlertType.INFORMATION, "La columna se ha borrado exitosamente");
+                    alert.showAndWait();
+                    cargarDatos();
+                }
             }
-        }
-        else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Debe introducir un código de producto.", ButtonType.OK );
+        }else {
+            alert = new Alert(Alert.AlertType.INFORMATION, "No se han borrado los datos");
             alert.showAndWait();
         }
 
 
     }
     public void onActualizarClicked(ActionEvent actionEvent) {
-        if ( ! productoAux.getProductCode().trim().equals("")) {
-            if (productDAO.altaProducto(productoAux)) {
-                cargarDatosTabla();
-            }
-        }
-        else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Debe introducir un código de producto.", ButtonType.OK );
-            alert.showAndWait();
-        }
+        cargarDatos();
 
 
     }
